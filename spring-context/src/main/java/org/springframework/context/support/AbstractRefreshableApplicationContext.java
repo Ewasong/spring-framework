@@ -119,6 +119,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		// 如果已经建立了BeanFactory，则关闭和销毁该BeanFactory
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
@@ -126,7 +127,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		try {
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			beanFactory.setSerializationId(getId());
+			// 定制Factory参数 比如允许Bean覆盖， 允许循环引用
 			customizeBeanFactory(beanFactory);
+			// 加载类定义
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}
@@ -180,6 +183,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
+	 * 在上下文中创建DefaultListableBeanFactory的地方，
+	 * 而getInternalParentBeanFactory()会根据容器已有的
+	 * 双亲IoC容器的信息来生成DefaultListableBeanFactory的双亲IoC容器
 	 * Create an internal bean factory for this context.
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation creates a
