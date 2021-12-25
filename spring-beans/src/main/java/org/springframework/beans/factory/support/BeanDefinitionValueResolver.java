@@ -296,10 +296,13 @@ class BeanDefinitionValueResolver {
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
+			// 从RuntimeBeanReference取得reference的名字，
+			// 这个RuntimeBeanReference是在载入BeanDefinition时根据配置生成的
 			Object bean;
 			Class<?> beanType = ref.getBeanType();
 			if (ref.isToParent()) {
 				BeanFactory parent = this.beanFactory.getParentBeanFactory();
+				// 如果ref是在双亲IoC容器中，那就到双亲IoC容器中去获取
 				if (parent == null) {
 					throw new BeanCreationException(
 							this.beanDefinition.getResourceDescription(), this.beanName,
@@ -310,6 +313,8 @@ class BeanDefinitionValueResolver {
 					bean = parent.getBean(beanType);
 				}
 				else {
+					// 在当前IoC容器中去获取Bean，这里会触发一个getBean的过程，
+					// 如果依赖注入没有发生，这里会触发相应的依赖注入的发生
 					bean = parent.getBean(String.valueOf(doEvaluate(ref.getBeanName())));
 				}
 			}
@@ -405,6 +410,7 @@ class BeanDefinitionValueResolver {
 	/**
 	 * For each element in the managed array, resolve reference if necessary.
 	 */
+	// 对Array注入
 	private Object resolveManagedArray(Object argName, List<?> ml, Class<?> elementType) {
 		Object resolved = Array.newInstance(elementType, ml.size());
 		for (int i = 0; i < ml.size(); i++) {

@@ -272,6 +272,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
 		if (tokens.keys != null) {
+			// 设置tokens的索引和keys
 			processKeyedProperty(tokens, pv);
 		}
 		else {

@@ -54,6 +54,19 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
 
 
+	/**
+	 * 这里用CGLIB对Bean进行实例化。CGLIB是一个常用的字节码生成器的类库，
+	 * 它提供了一系列的API来提供生成和转换Java的字节码的功能。在Spring AOP中也使用CGLIB对Java的字节码进行增强。
+	 * 在IoC容器中，要了解怎样使用CGLIB来生成Bean对象，需要看一下SimpleInstantiationStrategy类。
+	 * 这个Strategy是Spring用来生成Bean对象的默认类，它提供了两种实例化Java对象的方法，
+	 * 一种是通过BeanUtils，它使用了JVM的反射功能，一种是通过前面提到的CGLIB来生成，如代码清单2-25所示。
+	 * @param bd the bean definition
+	 * @param beanName the name of the bean when it is created in this context.
+	 * The name can be {@code null} if we are autowiring a bean which doesn't
+	 * belong to the factory.
+	 * @param owner the owning BeanFactory
+	 * @return
+	 */
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
