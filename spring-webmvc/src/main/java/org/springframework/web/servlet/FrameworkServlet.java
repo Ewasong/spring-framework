@@ -520,6 +520,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * have been set. Creates this servlet's WebApplicationContext.
 	 */
 	@Override
+	// 这个initServletBean的初始化过程在FrameworkServlet中完成
 	protected final void initServletBean() throws ServletException {
 		getServletContext().log("Initializing Spring " + getClass().getSimpleName() + " '" + getServletName() + "'");
 		if (logger.isInfoEnabled()) {
@@ -528,6 +529,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// 初始化上下文
 			this.webApplicationContext = initWebApplicationContext();
 			initFrameworkServlet();
 		}
@@ -559,9 +561,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @see #setContextConfigLocation
 	 */
 	protected WebApplicationContext initWebApplicationContext() {
+		// 这里调用WebApplicationContextUtils静态类来得到根上下文，这个根上下文是保存在ServletContext中的
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
+
 
 		if (this.webApplicationContext != null) {
 			// A context instance was injected at construction time -> use it
@@ -598,6 +602,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			}
 		}
 
+		// 把当前建立的上下文存到ServletContext中去，
+		// 注意使用的属性名是和当前Servlet名相关的
 		if (this.publishContext) {
 			// Publish the context as a servlet context attribute.
 			String attrName = getServletContextAttributeName();
