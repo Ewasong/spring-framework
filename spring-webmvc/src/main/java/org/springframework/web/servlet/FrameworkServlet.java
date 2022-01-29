@@ -660,10 +660,14 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 					"': custom WebApplicationContext class [" + contextClass.getName() +
 					"] is not of type ConfigurableWebApplicationContext");
 		}
+		// 实例化需要的具体上下文对象，并为这个上下文对象设置属性
+		/** 这里使用的是DEFAULT_CONTEXT_CLASS，这个DEFAULT_CONTEXT_CLASS
+			被设置为XmlWebApplicationContext.class，所以在DispatcherServlet中使用的IoC容器是XmlWebApplicationContext*/
 		ConfigurableWebApplicationContext wac =
 				(ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 
 		wac.setEnvironment(getEnvironment());
+		// 配置双亲上下文，就是在ContextLoader中建立的根上下文
 		wac.setParent(parent);
 		String configLocation = getContextConfigLocation();
 		if (configLocation != null) {
@@ -688,6 +692,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			}
 		}
 
+		// 设置ServletContext的引用和其他相关的配置信息
 		wac.setServletContext(getServletContext());
 		wac.setServletConfig(getServletConfig());
 		wac.setNamespace(getNamespace());
@@ -703,6 +708,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 		postProcessWebApplicationContext(wac);
 		applyInitializers(wac);
+		// 这里同样是通过refresh来调用容器的初始化过程的
 		wac.refresh();
 	}
 

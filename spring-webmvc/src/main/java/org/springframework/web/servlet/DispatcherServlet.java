@@ -584,7 +584,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
-
+		// 这里导入所有的HandlerMapping Bean，这些Bean可以在当前的DispatcherServlet的IoC容器中，也可能在其双亲上下文中
+		//这个detectAllHandlerMappings的默认值设为true，即默认地从所有的IoC容器中取
 		if (this.detectAllHandlerMappings) {
 			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
 			Map<String, HandlerMapping> matchingBeans =
@@ -596,6 +597,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 		else {
+			// 可以根据名称从当前的IoC容器中通过getBean获取handlerMapping
 			try {
 				HandlerMapping hm = context.getBean(HANDLER_MAPPING_BEAN_NAME, HandlerMapping.class);
 				this.handlerMappings = Collections.singletonList(hm);
@@ -607,6 +609,8 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		// Ensure we have at least one HandlerMapping, by registering
 		// a default HandlerMapping if no other mappings are found.
+		// 如果没有找到handerMappings，那么需要为Servlet设定默认的handlerMappings，
+		// 这些默认的值可以设置在DispatcherServlet.properties中
 		if (this.handlerMappings == null) {
 			this.handlerMappings = getDefaultStrategies(context, HandlerMapping.class);
 			if (logger.isTraceEnabled()) {
@@ -935,7 +939,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 			}
 		}
-
+		// 对HTTP请求参数进行快照处理
 		// Make framework objects available to handlers and view objects.
 		request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
 		request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
@@ -958,6 +962,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		try {
+			// 这个doDispatch是分发请求的入口
 			doDispatch(request, response);
 		}
 		finally {
@@ -1030,6 +1035,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 
 		try {
+			// 这里为视图准备好一个ModelAndView，这个ModelAndView持有handler处理请求的结果
 			ModelAndView mv = null;
 			Exception dispatchException = null;
 
@@ -1038,6 +1044,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
+				// 根据请求得到对应的handler，handler的注册以及getHandler的实现
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
@@ -1067,7 +1074,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
-
+				// 判断是否需要进行视图名的翻译和转换
 				applyDefaultViewName(processedRequest, mv);
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
@@ -1139,6 +1146,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		// Did the handler return a view to render?
+		// 这里使用视图对ModelAndView数据的展现
 		if (mv != null && !mv.wasCleared()) {
 			render(mv, request, response);
 			if (errorView) {

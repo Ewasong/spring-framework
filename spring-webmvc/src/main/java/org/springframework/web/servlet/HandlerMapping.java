@@ -168,6 +168,9 @@ public interface HandlerMapping {
 	 * @throws Exception if there is an internal error
 	 */
 	@Nullable
+	/** 调用getHandler实际上返回的是一个HandlerExecutionChain，
+	 * 这是典型的Command的模式的使用，这个HandlerExecutionChain
+	 * 不但持有handler本身，还包括了处理这个HTTP请求相关的拦截器*/
 	HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception;
 
 }
